@@ -575,6 +575,14 @@ do
 
   -- Shortcut for searching your Neovim configuration files
   vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config', follow = true } end, { desc = '[S]earch [N]eovim files' })
+
+  vim.pack.add { gh 'stevearc/oil.nvim' }
+  require('oil').setup {
+    view_options = {
+      show_hidden = true,
+    },
+  }
+  vim.keymap.set('n', '-', '<cmd>Oil<cr>', { desc = 'Open parent directory' })
 end
 
 -- ============================================================
@@ -687,7 +695,17 @@ do
   local servers = {
     -- clangd = {},
     -- gopls = {},
-    -- pyright = {},
+    pyright = {},
+    bashls = {},
+    yamlls = {
+      settings = {
+        yaml = {
+          schemas = {
+            ['https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json'] = 'docker-compose*.yml',
+          },
+        },
+      },
+    },
     -- rust_analyzer = {},
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -775,8 +793,9 @@ do
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
-        -- lua = true,
-        -- python = true,
+        lua = true,
+        python = true,
+        sh = true,
       }
       if enabled_filetypes[vim.bo[bufnr].filetype] then
         return { timeout_ms = 500 }
@@ -791,7 +810,10 @@ do
     formatters_by_ft = {
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
-      -- python = { "isort", "black" },
+      python = { 'black' },
+      lua = { 'stylua' },
+      sh = { 'shfmt' },
+      yaml = { 'prettier' },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
